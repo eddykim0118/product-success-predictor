@@ -1,11 +1,3 @@
-"""
-Activation Functions
-====================
-
-Implements various activation functions and their derivatives from scratch.
-All functions work with NumPy arrays for vectorized operations.
-"""
-
 import numpy as np
 
 
