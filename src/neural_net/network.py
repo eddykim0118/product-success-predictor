@@ -240,4 +240,73 @@ class Network:
             Loss value
         """
         predictions = self.predict(X)
-        loss = self.loss_function.forward(
+        loss = self.loss_function.forward(y, predictions)
+        return loss
+    
+    def save_weights(self, filepath):
+        """
+        Save model weights to file.
+        
+        Args:
+            filepath: Path to save weights
+        """
+        weights = {}
+        for i, layer in enumerate(self.layers):
+            params = layer.get_params()
+            if params:
+                weights[f'layer_{i}'] = params
+        
+        np.save(filepath, weights)
+        print(f"Weights saved to {filepath}")
+    
+    def load_weights(self, filepath):
+        """
+        Load model weights from file.
+        
+        Args:
+            filepath: Path to load weights from
+        """
+        weights = np.load(filepath, allow_pickle=True).item()
+        
+        for i, layer in enumerate(self.layers):
+            if f'layer_{i}' in weights:
+                params = weights[f'layer_{i}']
+                layer_params = layer.get_params()
+                
+                for j, param in enumerate(layer_params):
+                    param[:] = params[j]
+        
+        print(f"Weights loaded from {filepath}")
+    
+    def summary(self):
+        """
+        Print model summary.
+        """
+        print("=" * 70)
+        print(f"{'Layer (type)':<30} {'Output Shape':<20} {'Param #':<15}")
+        print("=" * 70)
+        
+        total_params = 0
+        
+        for i, layer in enumerate(self.layers):
+            params = layer.get_params()
+            num_params = sum(p.size for p in params)
+            total_params += num_params
+            
+            # Get output shape (approximation)
+            layer_name = f"{layer.__class__.__name__}_{i}"
+            output_shape = "?"
+            
+            if hasattr(layer, 'output_dim'):
+                output_shape = f"(None, {layer.output_dim})"
+            
+            print(f"{layer_name:<30} {output_shape:<20} {num_params:<15,}")
+        
+        print("=" * 70)
+        print(f"Total params: {total_params:,}")
+        print(f"Trainable params: {total_params:,}")
+        print(f"Non-trainable params: 0")
+        print("=" * 70)
+    
+    def __repr__(self):
+        return f"Network({len(self.layers)} layers)"
