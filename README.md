@@ -2,14 +2,14 @@
 
 **[Kaggle Competition](https://www.kaggle.com/competitions/rsna-intracranial-aneurysm-detection)**
 
-뇌혈관 3D MRA/CTA 영상에서 뇌동맥류(Intracranial Aneurysm)를 탐지하고 위치를 분류하는 딥러닝 프로젝트
+Deep learning project for detecting and localizing intracranial aneurysms from 3D MRA/CTA brain vessel images.
 
 ## 🎯 Competition Overview
 
 ### Task
-- **Multi-label Classification**: 14개 타겟 예측
-  - `aneurysm_present`: 동맥류 존재 여부 (가중치 13)
-  - 13개 위치별 존재 여부 (가중치 1):
+- **Multi-label Classification**: Predict 14 targets
+  - `aneurysm_present`: Whether aneurysm exists (weight 13)
+  - 13 location-specific labels (weight 1 each):
     - ICA (Internal Carotid Artery) - L/R
     - MCA (Middle Cerebral Artery) - L/R
     - ACA (Anterior Cerebral Artery) - L/R
@@ -23,7 +23,7 @@
 Final Score = (1/2) × (AUC_AP + (1/13) × Σ AUC_location)
 ```
 - Weighted Mean AUC ROC
-- `aneurysm_present`에 가중치 13 적용
+- `aneurysm_present` has weight 13 in evaluation
 
 ## 📁 Project Structure
 
@@ -32,9 +32,9 @@ rsna-intracranial-aneurysm-detection/
 │
 ├── src/
 │   ├── data/
-│   │   ├── loader.py          # DICOM 데이터 로더
-│   │   ├── preprocessor.py    # CT/MRA 전처리
-│   │   └── augmentation.py    # 3D 데이터 증강
+│   │   ├── loader.py          # DICOM data loader
+│   │   ├── preprocessor.py    # CT/MRA preprocessing
+│   │   └── augmentation.py    # 3D data augmentation
 │   │
 │   ├── models/
 │   │   ├── resnet3d.py        # 3D ResNet (10/18/34/50)
@@ -43,22 +43,22 @@ rsna-intracranial-aneurysm-detection/
 │   │
 │   ├── training/
 │   │   ├── trainer.py         # Training loop
-│   │   ├── metrics.py         # AUC, Dice, IoU 등
-│   │   └── losses.py          # Focal, Asymmetric Loss 등
+│   │   ├── metrics.py         # AUC, Dice, IoU, etc.
+│   │   └── losses.py          # Focal, Asymmetric Loss, etc.
 │   │
 │   └── utils/
-│       ├── visualization.py   # 영상 시각화
-│       └── dicom_utils.py     # DICOM 유틸리티
+│       ├── visualization.py   # Image visualization
+│       └── dicom_utils.py     # DICOM utilities
 │
 ├── scripts/
-│   ├── train.py              # 학습 실행
-│   ├── evaluate.py           # 평가 실행
-│   ├── predict.py            # 추론 실행
-│   └── visualize_results.py  # 결과 시각화
+│   ├── train.py              # Run training
+│   ├── evaluate.py           # Run evaluation
+│   ├── predict.py            # Run inference
+│   └── visualize_results.py  # Visualize results
 │
 ├── configs/
-│   ├── baseline.yaml         # 기본 설정
-│   └── advanced.yaml         # 고급 설정
+│   ├── baseline.yaml         # Basic configuration
+│   └── advanced.yaml         # Advanced configuration
 │
 ├── tests/
 │   ├── test_data.py
@@ -66,13 +66,13 @@ rsna-intracranial-aneurysm-detection/
 │   └── test_training.py
 │
 ├── data/
-│   ├── raw/                  # 원본 DICOM 데이터
-│   └── processed/            # 전처리된 데이터
+│   ├── raw/                  # Raw DICOM data
+│   └── processed/            # Preprocessed data
 │
 └── outputs/
-    ├── checkpoints/          # 모델 체크포인트
-    ├── logs/                 # 학습 로그
-    └── submissions/          # Kaggle 제출 파일
+    ├── checkpoints/          # Model checkpoints
+    ├── logs/                 # Training logs
+    └── submissions/          # Kaggle submission files
 ```
 
 ## 🚀 Quick Start

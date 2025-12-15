@@ -29,8 +29,6 @@
 | 3D support | None | Native |
 | Clinical validation | None | FDA-cleared workflows |
 
-**Interview Point**: Medical images contain diagnostic information that would be lost with standard image formats. A 12-bit CT scan has 4,096 gray levels - JPEG's 256 levels would hide subtle findings.
-
 ### Key DICOM Tags
 
 ```python
