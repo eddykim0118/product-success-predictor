@@ -1,9 +1,36 @@
+# Core Deep Learning
+torch>=2.0.0
+torchvision>=0.15.0
+
+# Medical Imaging AI
+monai>=1.3.0
+
+# DICOM & Medical Image Processing
+pydicom>=2.4.0
+nibabel>=5.0.0
+SimpleITK>=2.3.0
+
+# Data Processing
 numpy>=1.24.0
 pandas>=2.0.0
+scipy>=1.10.0
+
+# Visualization
 matplotlib>=3.7.0
 seaborn>=0.12.0
-scikit-learn>=1.3.0  # comparison용
-jupyter>=1.0.0
-pytest>=7.4.0
+plotly>=5.15.0
 
-kaggle
+# Jupyter
+jupyter>=1.0.0
+ipywidgets>=8.0.0
+
+# Kaggle
+kaggle>=1.5.0
+
+# Utilities
+tqdm>=4.65.0
+pyyaml>=6.0
+python-dotenv>=1.0.0
+
+# Testing (optional)
+pytest>=7.4.0

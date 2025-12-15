@@ -1,0 +1,111 @@
+# RSNA Intracranial Aneurysm Detection - Baseline Configuration
+# ==============================================================
+
+# Experiment info
+experiment:
+  name: "baseline_resnet18"
+  description: "Baseline 3D ResNet-18 for multi-label classification"
+  seed: 42
+
+# Data configuration
+data:
+  data_dir: "data/raw"
+  processed_dir: "data/processed"
+  train_csv: "data/train.csv"
+  val_split: 0.2
+  test_split: 0.1
+  
+  # Preprocessing
+  preprocessing:
+    target_spacing: [1.0, 1.0, 1.0]  # Isotropic 1mm
+    hu_window: [-100, 400]           # CTA window
+    normalize: true
+    crop_size: [64, 128, 128]        # D, H, W
+  
+  # Augmentation (training only)
+  augmentation:
+    rotation_range: 15
+    flip_prob: 0.5
+    intensity_shift: 0.1
+    noise_std: 0.05
+    blur_prob: 0.2
+
+# Model configuration  
+model:
+  type: "resnet18"  # resnet18, resnet34, resnet50
+  in_channels: 1
+  num_classes: 14   # 1 (aneurysm present) + 13 (locations)
+  base_width: 64
+  dropout: 0.5
+  pretrained: false
+
+# Training configuration
+training:
+  epochs: 100
+  batch_size: 4
+  accumulation_steps: 4  # Effective batch size = 16
+  
+  # Optimizer
+  optimizer:
+    type: "adamw"
+    lr: 1.0e-4
+    weight_decay: 1.0e-4
+    betas: [0.9, 0.999]
+  
+  # Scheduler
+  scheduler:
+    type: "cosine"
+    min_lr: 1.0e-6
+    warmup_epochs: 5
+  
+  # Loss
+  loss:
+    type: "weighted_multilabel"
+    aneurysm_weight: 13.0  # Competition weighting
+  
+  # Regularization
+  gradient_clip: 1.0
+  mixed_precision: true
+  
+  # Early stopping
+  early_stopping:
+    patience: 15
+    monitor: "val_auc"
+    mode: "max"
+  
+  # Checkpointing
+  checkpoint:
+    save_best: true
+    save_last: true
+    save_every: 10
+
+# Validation configuration
+validation:
+  batch_size: 8
+  metrics:
+    - "auc"
+    - "accuracy"
+    - "sensitivity"
+    - "specificity"
+
+# Inference configuration
+inference:
+  batch_size: 8
+  tta: true  # Test-time augmentation
+  tta_transforms:
+    - "original"
+    - "flip_x"
+    - "flip_y"
+
+# Logging
+logging:
+  log_dir: "outputs/logs"
+  tensorboard: true
+  wandb: false
+  log_every: 10
+
+# Output paths
+output:
+  checkpoint_dir: "outputs/checkpoints/baseline"
+  results_dir: "outputs/results/baseline"
+

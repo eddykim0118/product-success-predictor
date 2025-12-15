@@ -1,0 +1,175 @@
+# RSNA Intracranial Aneurysm Detection - Advanced Configuration
+# ==============================================================
+
+# Experiment info
+experiment:
+  name: "advanced_resnet50_ensemble"
+  description: "Advanced setup with ResNet-50 and ensemble techniques"
+  seed: 42
+
+# Data configuration
+data:
+  data_dir: "data/raw"
+  processed_dir: "data/processed"
+  train_csv: "data/train.csv"
+  val_split: 0.15
+  test_split: 0.15
+  
+  # K-Fold cross validation
+  kfold:
+    enabled: true
+    n_splits: 5
+    stratified: true
+  
+  # Preprocessing
+  preprocessing:
+    target_spacing: [0.5, 0.5, 0.5]  # Higher resolution
+    hu_window: [-100, 400]
+    normalize: true
+    crop_size: [96, 192, 192]        # Larger input
+  
+  # Strong augmentation
+  augmentation:
+    rotation_range: 20
+    flip_prob: 0.5
+    intensity_shift: 0.15
+    noise_std: 0.08
+    blur_prob: 0.3
+    elastic_deform: true
+    elastic_alpha: 100
+    elastic_sigma: 10
+    cutout_prob: 0.2
+    cutout_size: 20
+
+# Model configuration  
+model:
+  type: "resnet50"
+  in_channels: 1
+  num_classes: 14
+  base_width: 64
+  dropout: 0.5
+  pretrained: false
+  
+  # Attention mechanisms
+  attention:
+    enabled: true
+    type: "se"  # squeeze-excitation
+  
+  # Deep supervision
+  deep_supervision:
+    enabled: true
+    weights: [1.0, 0.5, 0.25, 0.125]
+
+# Training configuration
+training:
+  epochs: 150
+  batch_size: 2
+  accumulation_steps: 8  # Effective batch size = 16
+  
+  # Optimizer
+  optimizer:
+    type: "adamw"
+    lr: 5.0e-5
+    weight_decay: 1.0e-3
+    betas: [0.9, 0.999]
+  
+  # Scheduler - OneCycleLR for better convergence
+  scheduler:
+    type: "onecycle"
+    max_lr: 1.0e-3
+    pct_start: 0.1
+    anneal_strategy: "cos"
+  
+  # Loss - Asymmetric loss for class imbalance
+  loss:
+    type: "asymmetric"
+    gamma_neg: 4.0
+    gamma_pos: 1.0
+    clip: 0.05
+  
+  # Additional losses
+  auxiliary_loss:
+    enabled: true
+    weight: 0.4
+  
+  # Regularization
+  gradient_clip: 1.0
+  mixed_precision: true
+  label_smoothing: 0.1
+  
+  # SWA - Stochastic Weight Averaging
+  swa:
+    enabled: true
+    start_epoch: 100
+    lr: 1.0e-5
+  
+  # Early stopping
+  early_stopping:
+    patience: 25
+    monitor: "val_auc"
+    mode: "max"
+  
+  # Checkpointing
+  checkpoint:
+    save_best: true
+    save_last: true
+    save_every: 5
+    save_top_k: 3
+
+# Ensemble configuration
+ensemble:
+  enabled: true
+  strategy: "mean"  # mean, weighted, stacking
+  
+  # Models to ensemble (from k-fold)
+  use_kfold_models: true
+  
+  # Or specify checkpoint paths
+  checkpoints: []
+
+# Validation configuration
+validation:
+  batch_size: 4
+  metrics:
+    - "auc"
+    - "weighted_auc"  # Competition metric
+    - "accuracy"
+    - "sensitivity"
+    - "specificity"
+    - "f1"
+
+# Inference configuration
+inference:
+  batch_size: 4
+  
+  # Test-time augmentation
+  tta:
+    enabled: true
+    transforms:
+      - "original"
+      - "flip_x"
+      - "flip_y"
+      - "flip_z"
+    aggregation: "mean"
+  
+  # Multi-scale inference
+  multiscale:
+    enabled: true
+    scales: [0.9, 1.0, 1.1]
+
+# Logging
+logging:
+  log_dir: "outputs/logs"
+  tensorboard: true
+  wandb:
+    enabled: true
+    project: "rsna-aneurysm"
+    entity: null
+  log_every: 5
+
+# Output paths
+output:
+  checkpoint_dir: "outputs/checkpoints/advanced"
+  results_dir: "outputs/results/advanced"
+  submission_dir: "outputs/submissions"
+
